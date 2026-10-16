@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unihockeykurs – Trainingsplaner</title>
+<style>
+:root{--bg:#f6f7f9;--sf:#fff;--tx:#1b2430;--mu:#6b7684;--ln:#dde1e7;--ac:#1f7a5c;--acs:#e1f2ec;--wa:#c2410c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181d;--sf:#1e242b;--tx:#e8ecf0;--mu:#97a1ad;--ln:#323b45;--ac:#4cc29a;--acs:#1d3a31;--wa:#fb923c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14181d;--sf:#1e242b;--tx:#e8ecf0;--mu:#97a1ad;--ln:#323b45;--ac:#4cc29a;--acs:#1d3a31;--wa:#fb923c;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:16px 16px 4px;max-width:1100px;margin:auto}
+h1{font-size:20px;margin:0}
+.sub{color:var(--mu);font-size:13px;margin-top:2px}
+main{display:grid;grid-template-columns:1fr;gap:14px;padding:12px 16px 32px;max-width:1100px;margin:auto}
+@media(min-width:800px){main{grid-template-columns:320px 1fr;align-items:start}}
+section{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:12px}
+h2{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+.zone{min-height:44px;border:1.5px dashed var(--ln);border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:6px}
+.zone.over{border-color:var(--ac);background:var(--acs)}
+.zone:empty::before{content:"Übung hierher ziehen";color:var(--mu);font-size:12.5px;padding:6px}
+.card{display:flex;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:6px 8px;cursor:grab}
+.card.done .nm{text-decoration:line-through;color:var(--mu)}
+.card.drag{opacity:.4}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}.pan{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:10px;margin-top:8px}.pan[hidden]{display:none}.dot{display:inline-flex;width:22px;height:22px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;margin-right:3px;vertical-align:middle}
+.card{flex-wrap:wrap}.cn{width:100%;min-height:48px;font-size:13px}
+.nm{flex:1;min-width:0;outline:none;word-break:break-word}
+.min{width:46px;border:1px solid var(--ln);background:var(--sf);color:var(--tx);border-radius:6px;padding:2px 4px;font:inherit;font-size:13px;text-align:right}
+.ib{border:0;background:none;color:var(--mu);cursor:pointer;font-size:16px;padding:2px 4px;line-height:1}
+.ib:hover{color:var(--tx)}
+select,input[type=text],textarea{border:1px solid var(--ln);background:var(--sf);color:var(--tx);border-radius:8px;padding:6px 8px;font:inherit;font-size:14px;max-width:100%}
+textarea{width:100%;resize:vertical;min-height:54px}
+.add{display:flex;gap:6px;margin-bottom:8px}
+.add input[type=text]{flex:1;min-width:0}
+button.pri{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:6px 12px;font:inherit;font-weight:600;cursor:pointer}
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.nav .grow{flex:1;min-width:140px}
+.bl{margin-bottom:12px}
+.bh{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px}
+.bh span{color:var(--mu);font-weight:500}
+.tot{font-size:13px;color:var(--mu);margin:2px 0 10px}
+.tot b{color:var(--ac)}.tot.warn b{color:var(--wa)}
+.lbl{font-size:12.5px;color:var(--mu);margin:8px 0 3px}
+#st{font-size:12px;color:var(--mu)}
+</style>
+</head>
+<body>
+<header><h1>Unihockeykurs – Trainingsplaner</h1><div class="sub">Übungen aus dem Ideenspeicher in die Wochen ziehen – sie bleiben im Speicher und lassen sich erneut einsetzen. <span id="st"></span></div><div class="bar"><span id="pr" class="sub"></span></div></header>
+<main>
+<section><h2>Ideenspeicher <span id="pc" class="sub"></span></h2>
+<div class="add"><select id="nc"></select><input type="text" id="nn" placeholder="Neue Übung…" maxlength="80"><input class="min" id="nm2" type="number" value="10" min="1" max="90" title="Minuten"><button class="pri" id="ab">+</button></div>
+<div id="pool"></div></section>
+<section><div class="nav"><button class="ib" id="pv" title="Vorherige Woche">◀</button><select id="ws"></select><button class="ib" id="nx" title="Nächste Woche">▶</button>
+<input type="text" class="grow" id="th" placeholder="Wochenthema"><input type="text" id="wh" placeholder="Planer:in" style="width:110px"></div>
+<h2>Schwerpunkt</h2><textarea id="sp" placeholder="Fokus dieser Woche, z. B. Passspiel unter Druck – worauf achten wir?"></textarea>
+<div class="tot" id="tot" style="margin-top:10px"></div><div id="blocks"></div>
+<h2 style="margin-top:6px">Notizen</h2><textarea id="nt" placeholder="Was lief gut? Was ändern wir? Material, Teilnehmende…"></textarea></section>
+</main>
+<script>
+var BL=[["Warm-up",20],["Trainingsübungen",70]],NW=14;
+var S=blank(),cur=0,drag=null,doc=null,open={};
+function blank(){var w=[];for(var i=0;i<NW;i++)w.push({th:"",who:"",sp:"",nt:"",b:[[],[]]});return{v:3,pool:[[],[]],weeks:w}}
+function mig(o){if(o&&o.v===3)return o;var n=blank();if(!o)return n;var m=o.v===2?[0,1,1]:[0,1,1,1,1];if(o.v===2)o.pool.forEach(function(l,k){n.pool[m[k]]=n.pool[m[k]].concat(l)});else if(o.pool)n.pool[1]=o.pool;(o.weeks||[]).forEach(function(w,i){if(i>=NW)return;var x=n.weeks[i];x.th=w.th||"";x.who=w.who||"";x.nt=w.nt||"";(w.b||[]).forEach(function(l,k){x.b[m[k]||0]=x.b[m[k]||0].concat(l)})});return n}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function $(i){return document.getElementById(i)}
+function uid(){return Math.random().toString(36).slice(2,9)}
+function lst(z){var a=z.split(":");return a[0]==="p"?S.pool[+a[1]]:S.weeks[cur].b[+a[1]]}
+function find(id){var ls=S.pool.concat(S.weeks[cur].b);for(var i=0;i<ls.length;i++)for(var j=0;j<ls[i].length;j++)if(ls[i][j].id===id)return{l:ls[i],i:j}}
+function dest(id,z,idx){var f=find(id);if(!f)return;var t=lst(z),fp=S.pool.indexOf(f.l)>-1,tw=z[0]==="w",ex=f.l[f.i];if(idx==null||idx>t.length)idx=t.length;
+ if(fp&&tw){t.splice(idx,0,{id:uid(),n:ex.n,m:ex.m,o:ex.o,src:ex.id})}
+ else if(!fp&&z[0]==="p"&&ex.src&&S.pool.some(function(l){return l.some(function(p){return p.id===ex.src})})){f.l.splice(f.i,1)}
+ else{f.l.splice(f.i,1);t.splice(idx,0,ex)}
+ save();render()}
+function save(){$("st").textContent="";var j=JSON.stringify(S);try{localStorage.setItem("uh2",j)}catch(e){}
+ if(doc)doc.set({json:j}).then(function(){$("st").textContent="· gespeichert, geteilt"}).catch(function(){$("st").textContent="· Speichern fehlgeschlagen"})}
+function dopts(){var o='<option>↪</option>';BL.forEach(function(b,i){o+='<option value="p:'+i+'">Ideen · '+b[0]+'</option>'});BL.forEach(function(b,i){o+='<option value="w:'+i+'">Woche · '+b[0]+'</option>'});return o}
+function card(e,z){var d=document.createElement("div");d.className="card"+(e.done?" done":"");d.draggable=true;d.dataset.id=e.id;var wk=z[0]==="w",on=open[e.id]||e.o;
+ d.innerHTML=(wk?'<input type="checkbox" '+(e.done?"checked":"")+' title="Gemacht">':"")+'<span class="nm" contenteditable="plaintext-only">'+esc(e.n)+'</span><input class="min" type="number" min="1" max="90" value="'+e.m+'" title="Minuten"><button class="ib nb" title="Notiz">📝</button><select class="ib" title="Verschieben nach">'+dopts()+'</select><button class="ib xb" title="Löschen">×</button>'+(on?'<textarea class="cn" placeholder="Beschreibung, Aufbau, Coaching-Punkte…">'+esc(e.o||"")+'</textarea>':"");
+ var c=d.querySelector("input[type=checkbox]");if(c)c.onchange=function(){e.done=c.checked;save();render()};
+ var n=d.querySelector(".nm");n.onblur=function(){var t=n.textContent.trim();if(t&&t!==e.n){e.n=t;save()}};n.onkeydown=function(k){if(k.key==="Enter"){k.preventDefault();n.blur()}};
+ d.querySelector(".min").onchange=function(){e.m=Math.max(1,+this.value||10);save();render()};
+ d.querySelector(".nb").onclick=function(){open[e.id]=!on;render()};
+ var cn=d.querySelector(".cn");if(cn)cn.onchange=function(){e.o=this.value;save()};
+ d.querySelector("select").onchange=function(){if(this.value!=="")dest(e.id,this.value)};
+ d.querySelector(".xb").onclick=function(){var f=find(e.id);if(f){f.l.splice(f.i,1);save();render()}};
+ d.ondragstart=function(ev){drag=e.id;ev.dataTransfer.setData("text/plain",e.id);ev.dataTransfer.effectAllowed="move";setTimeout(function(){d.classList.add("drag")},0)};
+ d.ondragend=function(){drag=null;render()};return d}
+function zone(z){var el=document.createElement("div");el.className="zone";el.dataset.z=z;
+ el.ondragover=function(ev){if(!drag)return;ev.preventDefault();el.classList.add("over")};
+ el.ondragleave=function(ev){if(!el.contains(ev.relatedTarget))el.classList.remove("over")};
+ el.ondrop=function(ev){ev.preventDefault();var id=drag||ev.dataTransfer.getData("text/plain"),idx=0,cs=el.querySelectorAll(".card:not(.drag)");
+  for(var i=0;i<cs.length;i++){var r=cs[i].getBoundingClientRect();if(ev.clientY>r.top+r.height/2)idx=i+1}
+  drag=null;dest(id,z,idx)};
+ lst(z).forEach(function(e){el.appendChild(card(e,z))});return el}
+function sec(title,right,z){var d=document.createElement("div");d.className="bl";d.innerHTML='<div class="bh">'+title+'<span>'+right+'</span></div>';d.appendChild(zone(z));return d}
+function mins(l){return l.reduce(function(a,e){return a+e.m},0)}
+function render(){var w=S.weeks[cur],tot=0,n=0,p=$("pool");p.innerHTML="";
+ BL.forEach(function(b,i){n+=S.pool[i].length;p.appendChild(sec(b[0],S.pool[i].length+" Übungen","p:"+i))});$("pc").textContent=n+" gesamt";
+ var bs=$("blocks");bs.innerHTML="";
+ var wu=mins(w.b[0]);BL.forEach(function(b,i){var m=mins(w.b[i]);tot+=m;var tg=i===0?"15–20":(90-(wu||20));bs.appendChild(sec(b[0],m+" / "+tg+" Min","w:"+i))});
+ var t=$("tot");t.className="tot"+(tot>90?" warn":"");t.innerHTML="Geplant: <b>"+tot+" Min</b> von 90"+(tot<90?" · noch "+(90-tot)+" Min frei":tot>90?" · "+(tot-90)+" Min zu viel":"");
+ $("th").value=w.th;$("wh").value=w.who;$("sp").value=w.sp||"";$("nt").value=w.nt;$("ws").value=cur;
+ $("pv").disabled=cur===0;$("nx").disabled=cur===NW-1}
+function go(i){cur=Math.max(0,Math.min(NW-1,i));render()}
+(function init(){var o="";for(var i=0;i<NW;i++)o+='<option value="'+i+'">Woche '+(i+1)+'</option>';$("ws").innerHTML=o;
+ $("nc").innerHTML=BL.map(function(b,i){return'<option value="'+i+'">'+b[0]+'</option>'}).join("");
+ $("ws").onchange=function(){go(+this.value)};$("pv").onclick=function(){go(cur-1)};$("nx").onclick=function(){go(cur+1)};
+ $("th").onchange=function(){S.weeks[cur].th=this.value;save()};$("wh").onchange=function(){S.weeks[cur].who=this.value;save()};$("nt").onchange=function(){S.weeks[cur].nt=this.value;save()};$("sp").onchange=function(){S.weeks[cur].sp=this.value;save()};
+ function add(){var n=$("nn").value.trim();if(!n)return;S.pool[+$("nc").value].push({id:uid(),n:n,m:Math.max(1,+$("nm2").value||10)});$("nn").value="";save();render()}
+ $("ab").onclick=add;$("nn").onkeydown=function(e){if(e.key==="Enter")add()};
+ try{var l=localStorage.getItem("uh2");if(l)S=mig(JSON.parse(l))}catch(e){}
+ render();
+ if(window.claude)claude.use("db").then(function(db){if(!db)return;doc=db.doc("plan/main");
+  doc.onSnapshot(function(s){if(s.metadata.hasPendingWrites||drag)return;
+   if(s.exists){try{var r=JSON.parse(s.data().json),old=r.v!==3;S=mig(r);render();$("st").textContent="· geteilt";if(old)save()}catch(e){}}
+   else{$("st").textContent="· geteilt";save()}})}).catch(function(){});
+ 
+ 
+ if(window.claude)claude.use("room").then(function(r){if(!r)return;claude.use("user").then(function(u){
+  function show(){var ps=r.peers().filter(function(p){return p.kind==="viewer"}),ids=ps.map(function(p){return p.by}).filter(Boolean);
+   (u&&ids.length?u.profiles(ids):Promise.resolve({})).then(function(m){var h="";ps.forEach(function(p){var q=p.by&&m[p.by],nm=(q&&q.name)||"Gast";h+='<span class="dot" style="background:'+esc((q&&q.color)||"#6b7684")+'" title="'+esc(nm+(p.isMe?" (du)":""))+'">'+esc(nm.charAt(0).toUpperCase())+'</span>'});$("pr").innerHTML=ps.length?h+ps.length+" online":""})}
+  r.onPeers(show);r.presence({on:1}).then(show,function(){})})}).catch(function(){});
+})();
+</script>
+</body>
+</html>
